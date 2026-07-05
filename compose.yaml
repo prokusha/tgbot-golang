@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:18.3-bookworm
+    ports:
+      - 5432:5432
+    container_name: app-env-postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${P_USER}
+      - POSTGRES_PASSWORD=${P_PASSWORD}
+      - POSTGRES_DB=${P_DB}
+    volumes:
+      - ${PROJECT_ROOT}/out/pgresdata:/var/lib/postgresql
+  migrate:
+    image: migrate/migrate:v4.19.1
+    volumes:
+      - ${PROJECT_ROOT}/migrations:/migrations
