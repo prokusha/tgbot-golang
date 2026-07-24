@@ -1,18 +1,31 @@
 package main
 
-// "bufio"
-// "os"
-// "context"
-// "github.com/lrstanley/go-ytdlp"
-import . "github.com/prokusha/tgbot-golang/internal/telegram-bot/core"
+import (
+	"log/slog"
+	"os"
+
+	. "github.com/prokusha/tgbot-golang/internal/database/core"
+	ENV "github.com/prokusha/tgbot-golang/internal/env"
+	. "github.com/prokusha/tgbot-golang/internal/telegram-bot/core"
+)
 
 func main() {
-	TGBotInit()
-	// MUSIC_SERVICES.GetMusicURL("https://music.youtube.com/watch?v=xx7lToxUsNQ&si=MXOvKWhp8cP1-qGc")
-	// ytdlp.MustInstall(context.TODO(), nil)
-	// reader := bufio.NewReader(os.Stdin)
-	// for {
-	// 	query, _ := reader.ReadString('\n') // Читает до конца строки
-	// 	yt_search(query)
-	// }
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
+	ENV.LoadEnv()
+
+	pool, err := DatabaseInit()
+	if err != nil {
+		panic("Error init database pool: " + err.Error())
+	}
+	defer pool.Close()
+
+	tgBot, err := NewTelegramBot(pool)
+	if err = tgBot.Start(); err != nil {
+		panic("failed to start polling: " + err.Error())
+	}
+
+	slog.Info("Bot has been started...", "bot_username", tgBot.GetBotName())
+	tgBot.Idle()
 }

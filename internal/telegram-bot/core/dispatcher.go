@@ -8,7 +8,8 @@ import (
 	. "github.com/prokusha/tgbot-golang/internal/telegram-bot/commands"
 )
 
-func dispatcherHandlers(dispatcher *ext.Dispatcher) {
+func dispatcherHandlers(dispatcher *ext.Dispatcher, commHandlers *Handlers) {
+	dispatcher.AddHandler(handlers.NewCommand("ping", commHandlers.Ping))
 	dispatcher.AddHandler(handlers.NewCommand("start", Start))
 	// dispatcher.AddHandler(handlers.NewCommand("get_music", GetMusic))
 	dispatcher.AddHandler(handlers.NewCommand("search", Search))
